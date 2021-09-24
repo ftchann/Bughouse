@@ -9,8 +9,13 @@ socket_ = SocketIO(app, async_mode=async_mode)
 
 def index():
     return render_template('index.html',
-                           sync_mode=socket_.async_mode)
+                            sync_mode=socket_.async_mode)
 
+@app.route('/blabla')
+
+def blabla():
+    return render_template(blabla.html, 
+                            sync_mode=socket_.async_mode)
 
 if __name__ == '__main__':
     socket_.run(app, debug=True)
