@@ -51,16 +51,65 @@ class Board:
         for i in board_transposed:
             print('\t'.join(map(str, i)))
 
-    def inbound(self, coord, move):
-        pass
+    def inbound(self, coord):
+        x = coord[0]
+        y = coord[1]
+        if 0 <= x and x <= 7 and 0 <= y and y <= 7:
+            return True
+        else:
+            return False
     def get_pice_moves(self, coord, move_set, piece, turn):
         ''' Get all of the possible moves from a piece '''
+
         x = coord[0]
         y = coord[1]
         piece: Piece = self.board[x][y]
+        if piece.color != turn:
+            return []
+        #(oldpos, newpos)
         possible_moves = []
+        #None Pawns aka Knights, King
         for move in piece.getMoves():
-            if self.inbound(coord, move):
-                pass
+            newpos = (x + move[0], y + move[1])
+            if self.inbound(newpos):
+                piece_at_new_pos = self.board[newpos[0]][newpos[1]]
+                if piece_at_new_pos is None or piece_at_new_pos.color != turn:
+                    possible_moves.append((coord, newpos))
+        def add_new_pos(newpos, possible_moves):
+            piece_at_new_pos = self.board[newpos[0]][newpos[1]]
+            if piece_at_new_pos is None:
+                possible_moves.append((coord, newpos))
+                return False
+            elif piece_at_new_pos.color != turn:
+                possible_moves.append((coord, newpos))
+                return True
+            else:
+                return True
+        if piece.straight:
+            #Left
+            for i in range(1,7):
+                newpos = (x - i, y)
+                tobreak = add_new_pos(newpos, possible_moves)
+                if tobreak:
+                    break
+            #Right
+            for i in range(1,7):
+                newpos = (x - i, y)
+                tobreak = add_new_pos(newpos, possible_moves)
+                if tobreak:
+                    break
+            #Up
+            for i in range(1,7):
+                newpos = (x, y+i)
+                tobreak = add_new_pos(newpos, possible_moves)
+                if tobreak:
+                    break
+            #Down
+            for i in range(1,7):
+                newpos = (x, y-i)
+                tobreak = add_new_pos(newpos, possible_moves)
+                if tobreak:
+                    break
+
 
 b = Board()

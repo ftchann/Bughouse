@@ -52,21 +52,8 @@ class Pawn(Piece):
         self.straight = False
         self.diag = False
         self.moved = False
-        #self.moves base moves
-        if self.color == 0:
-            self.moves = [(0,1), (-1,1), (1,1) ]
-        else:
-            self.moves = [(0, -1), (-1, -1), (1, -1)]
-        self.abbr = "P"
-    def getMoves(self):
-        #white
-        if not self.moved:
-            if self.color == 0:
-                return self.moves + [(0,2)]
-            else:
-                return self.moves + [(0,-2)]
-        else:
-            return self.moves
+
+
 
 class King(Piece):
     def __init__(self, color):
