@@ -1,0 +1,66 @@
+'''
+Contains all of the information for an instance of the game.
+'''
+
+from pieces import Rook, Knight, Bishop, Queen, Pawn, King, Piece
+
+
+class Board:
+    '''
+    Stores boardstate of game.
+    '''
+    def __init__(self):
+        '''
+        Sets up all of the pieces that are initially on the board
+        when the game starts
+        '''
+        self.board = [[Piece]]
+        self.board = [[None for x in range(8)] for y in range(8)]
+        #Pieces to place in
+        self.pieces = []
+        self.set_initial_state()
+    def set_initial_state(self):
+        #0 is white
+        self.board[0][0] = Rook(0)
+        self.board[1][0] = Knight(0)
+        self.board[2][0] = Bishop(0)
+        self.board[3][0] = Queen(0)
+        self.board[4][0] = King(0)
+        self.board[5][0] = Bishop(0)
+        self.board[6][0] = Knight(0)
+        self.board[7][0] = Rook(0)
+        for i in range(8):
+            self.board[i][1] = Pawn(0)
+        #Black
+        self.board[0][7] = Rook(1)
+        self.board[1][7] = Knight(1)
+        self.board[2][7] = Bishop(1)
+        self.board[3][7] = Queen(1)
+        self.board[4][7] = King(1)
+        self.board[5][7] = Bishop(1)
+        self.board[6][7] = Knight(1)
+        self.board[7][7] = Rook(1)
+        for i in range(8):
+            self.board[i][6] = Pawn(1)
+    def __str__(self):
+        board_transposed = [list(x) for x in zip(*self.board)]
+        for i in range(8):
+            for j in range(8):
+                if board_transposed[i][j] is None:
+                    board_transposed[i][j] = "E"
+        for i in board_transposed:
+            print('\t'.join(map(str, i)))
+
+    def inbound(self, coord, move):
+        pass
+    def get_pice_moves(self, coord, move_set, piece, turn):
+        ''' Get all of the possible moves from a piece '''
+        x = coord[0]
+        y = coord[1]
+        piece: Piece = self.board[x][y]
+        possible_moves = []
+        for move in piece.getMoves():
+            if self.inbound(coord, move):
+                pass
+
+b = Board()
