@@ -60,6 +60,13 @@ class Board:
             return True
         else:
             return False
+    def is_piece(self, coord):
+        x = coord[0]
+        y = coord[1]
+        if self.board[x][y] is not None:
+            return True
+        else:
+            return False
     def get_piece_moves(self, coord, turn):
         ''' Get all of the possible moves from a piece
             Only Normal normals, No castling enpassent.
@@ -167,12 +174,7 @@ class Board:
                 if self.is_piece(self, coord):
                     allmoves += self.get_piece_moves(coord, turn)
         return allmoves
-    def is_piece(self, coord):
-        x = coord[0]
-        y = coord[1]
-        if self.board[x][y] is not None:
-            return True
-        else:
-            return False
+
+
 b = Board()
 print(b)
