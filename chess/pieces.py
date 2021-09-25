@@ -33,6 +33,7 @@ class Rook(Piece):
         self.color = color
         self.straight = True
         self.abbr = "R"
+        self.moved = False
 class Bishop(Piece):
     def __init__(self, color):
         super(Bishop, self).__init__()
@@ -62,3 +63,4 @@ class King(Piece):
         super(King, self).__init__()
         self.moves = [(-1,-1), (1,1), (-1,1), (1,-1), (0,1), (0,-1), (1,0), (-1,1)]
         self.abbr = "K"
+        self.moved = False
