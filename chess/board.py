@@ -4,6 +4,7 @@ Contains all of the information for an instance of the game.
 
 from pieces import Rook, Knight, Bishop, Queen, Pawn, King, Piece
 from copy import copy,deepcopy
+import random
 
 class Board:
     '''
@@ -24,30 +25,30 @@ class Board:
 
     def set_initial_state(self):
         #0 is white
-        self.board[0][0] = Rook(0)
-        self.board[1][0] = Knight(0)
-        self.board[2][0] = Bishop(0)
-        self.board[3][0] = Queen(0)
-        self.board[4][0] = King(0)
-        self.board[5][0] = Bishop(0)
-        self.board[6][0] = Knight(0)
-        self.board[7][0] = Rook(0)
+        self.board[0][0] = Rook(1)
+        self.board[1][0] = Knight(1)
+        self.board[2][0] = Bishop(1)
+        self.board[3][0] = Queen(1)
+        self.board[4][0] = King(1)
+        self.board[5][0] = Bishop(1)
+        self.board[6][0] = Knight(1)
+        self.board[7][0] = Rook(1)
 
         for i in range(8):
-            self.board[i][1] = Pawn(0)
+            self.board[i][1] = Pawn(1)
 
         #Black
-        self.board[0][7] = Rook(1)
-        self.board[1][7] = Knight(1)
-        self.board[2][7] = Bishop(1)
-        self.board[3][7] = Queen(1)
-        self.board[4][7] = King(1)
-        self.board[5][7] = Bishop(1)
-        self.board[6][7] = Knight(1)
-        self.board[7][7] = Rook(1)
+        self.board[0][7] = Rook(0)
+        self.board[1][7] = Knight(0)
+        self.board[2][7] = Bishop(0)
+        self.board[3][7] = Queen(0)
+        self.board[4][7] = King(0)
+        self.board[5][7] = Bishop(0)
+        self.board[6][7] = Knight(0)
+        self.board[7][7] = Rook(0)
 
         for i in range(8):
-            self.board[i][6] = Pawn(1)
+            self.board[i][6] = Pawn(0)
 
     def __str__(self):
         answer = ""
@@ -56,7 +57,7 @@ class Board:
             for j in range(8):
                 if board_transposed[i][j] is None:
                     board_transposed[i][j] = "."
-        for i in board_transposed:
+        for i in reversed(board_transposed):
             answer += ('\t'.join(map(str, i))) + "\n"
         return answer
 
@@ -75,6 +76,7 @@ class Board:
             return True
         else:
             return False
+
     def get_piece_attack_moves(self, coord, turn):
         ''' Get all of the attack possible moves from a piece
             Assumes there is piece.
@@ -236,16 +238,17 @@ class Board:
         return allmoves
 
     def get_all_legal_moves(self, turn):
-        allmoves = self.get_all_moves(self,turn)
+        allmoves = self.get_all_moves(turn)
         legalmoves = []
-        board_copy = deepcopy(self.board)
-        for (current, next) in allmoves:
+        board_copy = deepcopy(self)
+        for (current, nextt) in allmoves:
             try :
-                board_copy.move(current, next, turn)
-                legalmoves += (current,next)
-                board_copy = deepcopy(self.board)
-            except:
-                pass
+                board_copy.move(current, nextt, turn)
+                legalmoves.append((current,nextt))
+                board_copy = deepcopy(self)
+            except Exception as e:
+                print(e)
+        return legalmoves
 
     def move(self, current_square, next_square, turn):
         '''
@@ -260,7 +263,7 @@ class Board:
         self.board[current_square[0]][current_square[1]] = None
         taken_piece = self.board[next_square[0]][next_square[1]]
         self.board[next_square[0]][next_square[1]] = piece
-        if (self.is_checced(self, turn)):
+        if (self.is_checced(turn)):
             raise Exception("Illegal move, you are checked")
         #Set enpassent flag
         if type(piece) is Pawn and abs(current_square[1] - next_square[1]) == 2:
@@ -317,19 +320,19 @@ class Board:
         for row in range(8):
             for col in range(8):
                 piece = self.board[row][col]
-                attacced = not (piece == None) and ((row,col),coord) in self.get_piece_attack_moves(self, (row,col), not color)
+                attacced = not (piece == None) and ((row,col),coord) in self.get_piece_attack_moves((row,col), not color)
                 if attacced:
                     return attacced
         return attacced
 
     def is_checced(self, color):
         #is_checced(self, 0) checks if black is in check
-        self.is_field_attacked(self, self.find_king(self,color),color)
+        self.is_field_attacked(self.find_king(color),color)
 
-    def find_king(self, name, color):
+    def find_king(self, color):
         for row in range(8):
             for col in range(8):
-                if self.is_piece(self, (row,col)) and self.board[row][col].abbr == "K" and self.board[row][col].color == color:
+                if self.is_piece((row,col)) and self.board[row][col].abbr == "K" and self.board[row][col].color == color:
                     return (row,col)
         raise Exception("Bro idk what you have done, but apperantley there is one king missing")
 
@@ -340,4 +343,16 @@ class Board:
 
 if __name__ == '__main__':
     b = Board()
-    print(b)
+    turn = True
+    while True:
+        print(b)
+
+        moves = b.get_all_legal_moves(turn)
+        #for (i, move) in enumerate(moves):
+            #print(f'{i}. {move}')
+
+        _ = input("Next move...\n")
+        i = random.randint(0, len(moves)-1)
+        b.move(moves[i][0], moves[i][1], turn)
+
+        turn = not turn

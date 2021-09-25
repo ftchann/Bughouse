@@ -62,8 +62,8 @@ class Pawn(Piece):
 
 class King(Piece):
     def __init__(self, color):
-        self.color = color
         super(King, self).__init__()
+        self.color = color
         self.moves = [(-1,-1), (1,1), (-1,1), (1,-1), (0,1), (0,-1), (1,0), (-1,1)]
         self.abbr = "K"
         self.moved = False
