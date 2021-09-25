@@ -185,7 +185,7 @@ class Board:
     def get_piece_moves(self, coord, turn):
         ''' Get all of the possible moves from a piece
             Assumes there is piece.
-            Only Normal normals, No castling enpassent.
+            Only Normal normals, No castling, en-passant.
         '''
         x = coord[0]
         y = coord[1]
@@ -233,9 +233,21 @@ class Board:
         taken_piece = self.board[next_square[0]][next_square[1]]
         self.board[next_square[0]][next_square[1]] = piece
         return taken_piece
-    def castle(self, small, turn):
+
+    def is_field_attacked(self, coord, color):
+        attacced = False
+        for row in self.board:
+            for col in row:
+                piece = self.board[row][col]
+                attacced = piece.abbr != "^" and ((row,col),coord)) in rowself.get_piece_attack_moves(self, (row,col), not color)
+                if attacced:
+                    break
+            if attacced: 
+                break
+        return attacced
+    #def castle(self, small, turn):
         #King is at (0,4)
-        if small:
+        #if small:
 
 
 b = Board()
