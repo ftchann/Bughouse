@@ -222,7 +222,7 @@ class Board:
     def move(self, current_square, next_square, turn):
         '''
         Executes a Normal Move
-        returns taken piece, otherwise return None
+        returns (taken piece, itself if pawn reach last row), otherwise return None
         '''
         #Check is in all moves
         if (current_square,next_square) not in self.get_all_moves(turn):
@@ -232,11 +232,33 @@ class Board:
         self.board[current_square[0]][current_square[1]] = None
         taken_piece = self.board[next_square[0]][next_square[1]]
         self.board[next_square[0]][next_square[1]] = piece
-        return taken_piece
+        #Set enpassent flag
+        if type(piece) is Pawn and abs(current_square[1] - next_square[1]) == 2:
+            self.enpassent = next_square
+        #Assume rule pawns removed last row
+        #white
+        if turn == 0 and type(piece) is Pawn and next_square[1] == 7:
+            return (taken_piece, piece)
+        if turn == 1 and type(piece) is Pawn and next_square[1] == 0:
+            return (taken_piece, piece)
+        return (taken_piece, None)
     def castle(self, small, turn):
-        #King is at (0,4)
+        #todo add legatity
+        #King is at (turn,4)
+        row = 7 if turn else 0
         if small:
-
+            king:King = self.board[row][4]
+            rook:Rook = self.board[row][7]
+            if not king.moved and not rook.moved:
+                self.board[row][6] = king
+                self.board[row][5] = rook
+            #Big
+        else:
+            king:King = self.board[row][4]
+            rook:Rook = self.board[row][0]
+            if not king.moved and not rook.moved:
+                self.board[row][2] = king
+                self.board[row][3] = rook
 
 b = Board()
 print(b)
