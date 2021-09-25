@@ -3,6 +3,7 @@ Contains all of the information for an instance of the game.
 '''
 
 from pieces import Rook, Knight, Bishop, Queen, Pawn, King, Piece
+from copy import copy,deepcopy
 
 class Board:
     '''
@@ -77,7 +78,7 @@ class Board:
     def get_piece_attack_moves(self, coord, turn):
         ''' Get all of the attack possible moves from a piece
             Assumes there is piece.
-            Only Normal normals, No castling enpassant.
+            Only Normal normals, No castling enpassent.
         '''
 
         x = coord[0]
@@ -233,6 +234,19 @@ class Board:
                     allmoves += self.get_piece_moves(coord, turn)
         return allmoves
 
+    def get_all_legal_moves(self, turn):
+        allmoves = self.get_all_moves(self,turn)
+        legalmoves = []
+        board_copy = deepcopy(self.board)
+        for (current, next) in allmoves:
+            try :
+                board_copy.move(current, next, turn)
+                legalmoves += (current,next)
+                board_copy = deepcopy(self.board)
+            except:
+                pass
+                    
+
     def move(self, current_square, next_square, turn):
         '''
         Executes a Normal Move
@@ -246,9 +260,11 @@ class Board:
         self.board[current_square[0]][current_square[1]] = None
         taken_piece = self.board[next_square[0]][next_square[1]]
         self.board[next_square[0]][next_square[1]] = piece
-        #Set enpassant flag
+        if (self.is_checced(self, turn)):
+            raise Exception("Illegal move, you are checked")
+        #Set enpassent flag
         if type(piece) is Pawn and abs(current_square[1] - next_square[1]) == 2:
-            self.enpassant = next_square
+            self.enpassent = next_square
         #Assume rule pawns removed last row
         #white
         if turn and type(piece) is Pawn and next_square[1] == 7:
@@ -259,7 +275,7 @@ class Board:
         return (taken_piece, None)
 
     def castle(self, small, turn):
-        #TODO add legatity
+        #todo add legatity
         #King is at (turn,4)
         row = 7 if turn else 0
         if small:
@@ -276,32 +292,44 @@ class Board:
                 self.board[row][2] = king
                 self.board[row][3] = rook
 
-    def check_enpassant(self, current_field, turn):
-        return self.enpassant and (current_field in [[self.enpassant[0]-1, self.enpassant[1]],
-                                                 [self.enpassant[0]+1, self.enpassant[1]]]) \
-                                and self.board[self.enpassant[0]][self.enpassant[1]].color == \
-                                    self.board[current_field[0]][current_field[1]].color
-
     def move_enpassant(self, current_field, turn):
-        dy = 1 if turn else -1
+        if self.enpassant and (current_field == [self.enpassant[0]-1, self.enpassant[1]] or
+                current_field == [self.enpassant[0]+1, self.enpassant[1]]) \
+                and self.board[self.enpassant[0]][self.enpassant[1]].color != self.board[current_field[0]][self.current_field[1]]:
 
-        if self.check_enpassant(current_field, turn):
-            return_piece = self.board[self.enpassant[0]][self.enpassant[1]+dy]
-            self.board[self.enpassant[0]][self.enpassant[1]+dy] = self.board[current_field[0]][current_field[1]]
+            return_piece = self.board[self.enpassant[0]][self.enpassant[1]+1]
+            self.board[self.enpassant[0]][self.enpassant[1]+1] = self.board[current_field[0]][current_field[1]]
 
             return return_piece
 
         else: raise Exception("Illegal enpassant move!")
-
+    
     def is_field_attacked(self, coord, color):
+        #is_field_attacked(self, (5,5), False) checks if black is attacked on F6
         attacced = False
         for row in range(8):
             for col in range(8):
                 piece = self.board[row][col]
-                attacced = not (piece is None) and ((row,col),coord) in self.get_piece_attack_moves(self, (row,col), not color)
+                attacced = not (piece == None) and ((row,col),coord) in self.get_piece_attack_moves(self, (row,col), not color)
                 if attacced:
                     return attacced
         return attacced
+    
+    def is_checced(self, color):
+        #is_checced(self, 0) checks if black is in check
+        self.is_field_attacked(self, self.find_king(self,color),color)
+    
+    def find_king(self, name, color):
+        for row in range(8):
+            for col in range(8):
+                if self.is_piece(self, (row,col)) and self.board[row][col].abbr == "K" and self.board[row][col].color == color:
+                    return (row,col)
+        raise Exception("Bro idk what you have done, but apperantley there is one king missing")
+    
+    def checkmate(self, color):
+        #checkmate(self, 0) is true if black mated white
+
+        return False
 
 if __name__ == '__main__':
     b = Board()
