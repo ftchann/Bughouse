@@ -49,7 +49,7 @@ class Board:
         for i in range(8):
             for j in range(8):
                 if board_transposed[i][j] is None:
-                    board_transposed[i][j] = "E"
+                    board_transposed[i][j] = "."
         for i in board_transposed:
             answer += ('\t'.join(map(str, i))) + "\n"
         return answer
@@ -174,7 +174,8 @@ class Board:
                 if self.is_piece(self, coord):
                     allmoves += self.get_piece_moves(coord, turn)
         return allmoves
-
+    def castle(self, ):
+        pass
 
 b = Board()
 print(b)

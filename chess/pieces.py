@@ -14,7 +14,7 @@ class Piece:
         self.color = None
         #Tuples of direction change
         self.moves = []
-        self.abbr = "N"
+        self.abbr = "^"
     def getMoves(self):
         return self.moves
 
@@ -44,10 +44,11 @@ class Knight(Piece):
         super(Knight, self).__init__()
         self.color = color
         self.moves = [(-2,-1), (-1,-2), (1,-2), (2,-1), (2,1), (1,2), (-1,2), (-2,1)]
-        self.abbr = "K"
+        self.abbr = "N"
 class Pawn(Piece):
     def __init__(self, color):
         super(Pawn, self).__init__()
+        self.abbr = "P"
         self.color = color
         self.straight = False
         self.diag = False
