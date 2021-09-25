@@ -193,6 +193,7 @@ class Board:
                         possible_moves.append((coord, (x-1,y-1)))
 
         return possible_moves
+
     def get_piece_moves(self, coord, turn):
         ''' Get all of the possible moves from a piece
             Assumes there is piece.
@@ -279,26 +280,27 @@ class Board:
     def move_enpassant(self, current_field, turn):
         if self.enpassant and (current_field == [self.enpassant[0]-1, self.enpassant[1]] or
                 current_field == [self.enpassant[0]+1, self.enpassant[1]]) \
-                and board[enpassant[0]][enpassant[1]].color != board[current_field[0]][cucurrent_field[1]]:
+                and board[self.enpassant[0]][self.enpassant[1]].color != board[current_field[0]][cucurrent_field[1]]:
 
-            return_piece = self.board[enpassant[0]][enpassant[1]+1]
-            self.board[enpassant[0]][enpassant[1]+1] = board[current_field[0]][current_field[1]]
+            return_piece = self.board[self.enpassant[0]][self.enpassant[1]+1]
+            self.board[self.enpassant[0]][self.enpassant[1]+1] = board[current_field[0]][current_field[1]]
 
             return return_piece
 
         else: raise Exception("Illegal enpassant move!")
-    
+
     def is_field_attacked(self, coord, color):
-    attacced = False
-    for row in self.board:
-        for col in row:
-            piece = self.board[row][col]
-            attacced = piece.abbr != "^" and ((row,col),coord)) in self.get_piece_attack_moves(self, (row,col), not color)
+        attacced = False
+        for row in self.board:
+            for col in row:
+                piece = self.board[row][col]
+                attacced = piece.abbr != "^" and ((row,col),coord)) in rowself.get_piece_attack_moves(self, (row,col), not color)
+                if attacced:
+                    break
             if attacced:
                 break
-        if attacced: 
-            break
-    return attacced
+
+        return attacced
 
 if __name__ == '__main__':
     b = Board()
