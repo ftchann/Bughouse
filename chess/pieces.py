@@ -10,7 +10,7 @@ class Piece:
     def __init__(self):
         self.straight = False
         self.diag = False
-        # 0 is white
+        # True is white
         self.color = None
         #Tuples of direction change
         self.moves = []

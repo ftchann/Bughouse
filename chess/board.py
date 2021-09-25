@@ -171,7 +171,7 @@ class Board:
                         possible_moves.append((coord, (x-1,y+1)))
 
             #black
-            elif piece.color == 1:
+            elif not piece.color:
                 if self.inbound((x-1,y-1)):
                     left_hit:Piece = self.board[x-1][y-1]
                     if left_hit is not None and left_hit.color != turn:
@@ -196,13 +196,14 @@ class Board:
         possible_moves = []
         if type(piece) is Pawn:
             #white
-            if piece.color == 0:
+            if piece.color:
                 #Move
                 if self.board[x][y+1] is None:
                     possible_moves.append((coord, (x,y+1)))
                     if not piece.moved and self.board[x][y+2] is None:
                         possible_moves.append((coord, (x, y+2)))
-            if piece.color == 1:
+            #black
+            if not piece.color:
                 #Move
                 if self.board[x][y-1] is None:
                     possible_moves.append((coord, (x,y-1)))
@@ -226,7 +227,7 @@ class Board:
         '''
         #Check is in all moves
         if (current_square,next_square) not in self.get_all_moves(turn):
-            return Exception("Illegal move")
+            raise Exception("Illegal move")
 
         piece = self.board[current_square[0]][current_square[1]]
         self.board[current_square[0]][current_square[1]] = None
@@ -237,9 +238,10 @@ class Board:
             self.enpassent = next_square
         #Assume rule pawns removed last row
         #white
-        if turn == 0 and type(piece) is Pawn and next_square[1] == 7:
+        if turn and type(piece) is Pawn and next_square[1] == 7:
             return (taken_piece, piece)
-        if turn == 1 and type(piece) is Pawn and next_square[1] == 0:
+        #black
+        if not turn and type(piece) is Pawn and next_square[1] == 0:
             return (taken_piece, piece)
         return (taken_piece, None)
     def castle(self, small, turn):
