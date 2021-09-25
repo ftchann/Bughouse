@@ -10,7 +10,7 @@ class Piece:
     def __init__(self):
         self.straight = False
         self.diag = False
-        # 0 is white
+        # True is white
         self.color = None
         #Tuples of direction change
         self.moves = []
@@ -20,6 +20,7 @@ class Piece:
 
     def __str__(self):
         return self.abbr
+
 class Queen(Piece):
     def __init__(self, color):
         super(Queen, self).__init__()
@@ -27,6 +28,7 @@ class Queen(Piece):
         self.straight = True
         self.diag = True
         self.abbr = "Q"
+
 class Rook(Piece):
     def __init__(self, color):
         super(Rook, self).__init__()
@@ -34,18 +36,21 @@ class Rook(Piece):
         self.straight = True
         self.abbr = "R"
         self.moved = False
+
 class Bishop(Piece):
     def __init__(self, color):
         super(Bishop, self).__init__()
         self.color = color
         self.diag = True
         self.abbr = "B"
+
 class Knight(Piece):
     def __init__(self, color):
         super(Knight, self).__init__()
         self.color = color
         self.moves = [(-2,-1), (-1,-2), (1,-2), (2,-1), (2,1), (1,2), (-1,2), (-2,1)]
         self.abbr = "N"
+
 class Pawn(Piece):
     def __init__(self, color):
         super(Pawn, self).__init__()
@@ -54,8 +59,6 @@ class Pawn(Piece):
         self.straight = False
         self.diag = False
         self.moved = False
-
-
 
 class King(Piece):
     def __init__(self, color):

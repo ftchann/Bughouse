@@ -4,7 +4,6 @@ Contains all of the information for an instance of the game.
 
 from pieces import Rook, Knight, Bishop, Queen, Pawn, King, Piece
 
-
 class Board:
     '''
     Stores boardstate of game.
@@ -20,7 +19,8 @@ class Board:
         self.pieces_white = []
         self.pieces_black = []
         self.set_initial_state()
-        self.enpassent = None
+        self.enpassant = None
+
     def set_initial_state(self):
         #0 is white
         self.board[0][0] = Rook(0)
@@ -31,8 +31,10 @@ class Board:
         self.board[5][0] = Bishop(0)
         self.board[6][0] = Knight(0)
         self.board[7][0] = Rook(0)
+
         for i in range(8):
             self.board[i][1] = Pawn(0)
+
         #Black
         self.board[0][7] = Rook(1)
         self.board[1][7] = Knight(1)
@@ -42,8 +44,10 @@ class Board:
         self.board[5][7] = Bishop(1)
         self.board[6][7] = Knight(1)
         self.board[7][7] = Rook(1)
+
         for i in range(8):
             self.board[i][6] = Pawn(1)
+
     def __str__(self):
         answer = ""
         board_transposed = [list(x) for x in zip(*self.board)]
@@ -54,6 +58,7 @@ class Board:
         for i in board_transposed:
             answer += ('\t'.join(map(str, i))) + "\n"
         return answer
+
     def inbound(self, coord):
         x = coord[0]
         y = coord[1]
@@ -61,6 +66,7 @@ class Board:
             return True
         else:
             return False
+
     def is_piece(self, coord):
         x = coord[0]
         y = coord[1]
@@ -88,6 +94,7 @@ class Board:
                 piece_at_new_pos = self.board[newpos[0]][newpos[1]]
                 if piece_at_new_pos is None or piece_at_new_pos.color != turn:
                     possible_moves.append((coord, newpos))
+
         def add_new_pos(newpos, possible_moves):
             #Not inbound break instantly
             if not self.inbound(newpos):
@@ -101,6 +108,7 @@ class Board:
                 return True
             else:
                 return True
+
         if piece.straight:
             #Left
             for i in range(1,7):
@@ -113,6 +121,7 @@ class Board:
                 newpos = (x - i, y)
                 tobreak = add_new_pos(newpos, possible_moves)
                 if tobreak:
+
                     break
             #Up
             for i in range(1,7):
@@ -126,6 +135,7 @@ class Board:
                 tobreak = add_new_pos(newpos, possible_moves)
                 if tobreak:
                     break
+
         if piece.diag:
             #Left Down
             for i in range(1,7):
@@ -151,6 +161,7 @@ class Board:
                 tobreak = add_new_pos(newpos, possible_moves)
                 if tobreak:
                     break
+
         #Pawn
         if type(piece) is Pawn:
             #white
@@ -171,7 +182,7 @@ class Board:
                         possible_moves.append((coord, (x-1,y+1)))
 
             #black
-            elif piece.color == 1:
+            elif not piece.color:
                 if self.inbound((x-1,y-1)):
                     left_hit:Piece = self.board[x-1][y-1]
                     if left_hit is not None and left_hit.color != turn:
@@ -196,19 +207,21 @@ class Board:
         possible_moves = []
         if type(piece) is Pawn:
             #white
-            if piece.color == 0:
+            if piece.color:
                 #Move
                 if self.board[x][y+1] is None:
                     possible_moves.append((coord, (x,y+1)))
                     if not piece.moved and self.board[x][y+2] is None:
                         possible_moves.append((coord, (x, y+2)))
-            if piece.color == 1:
+            #black
+            if not piece.color:
                 #Move
                 if self.board[x][y-1] is None:
                     possible_moves.append((coord, (x,y-1)))
                     if not piece.moved and self.board[x][y-2] is None:
                         possible_moves.append((coord, (x, y-2)))
         return possible_moves + attack_moves
+
     def get_all_moves(self, turn):
         ''' Get all of the possible normal moves from a piece
         '''
@@ -219,36 +232,74 @@ class Board:
                 if self.is_piece(coord):
                     allmoves += self.get_piece_moves(coord, turn)
         return allmoves
+
     def move(self, current_square, next_square, turn):
         '''
         Executes a Normal Move
-        returns taken piece, otherwise return None
+        returns (taken piece, itself if pawn reach last row), otherwise return None
         '''
         #Check is in all moves
         if (current_square,next_square) not in self.get_all_moves(turn):
-            return Exception("Illegal move")
+            raise Exception("Illegal move")
 
         piece = self.board[current_square[0]][current_square[1]]
         self.board[current_square[0]][current_square[1]] = None
         taken_piece = self.board[next_square[0]][next_square[1]]
         self.board[next_square[0]][next_square[1]] = piece
-        return taken_piece
+        #Set enpassent flag
+        if type(piece) is Pawn and abs(current_square[1] - next_square[1]) == 2:
+            self.enpassent = next_square
+        #Assume rule pawns removed last row
+        #white
+        if turn and type(piece) is Pawn and next_square[1] == 7:
+            return (taken_piece, piece)
+        #black
+        if not turn and type(piece) is Pawn and next_square[1] == 0:
+            return (taken_piece, piece)
+        return (taken_piece, None)
 
+    def castle(self, small, turn):
+        #todo add legatity
+        #King is at (turn,4)
+        row = 7 if turn else 0
+        if small:
+            king:King = self.board[row][4]
+            rook:Rook = self.board[row][7]
+            if not king.moved and not rook.moved:
+                self.board[row][6] = king
+                self.board[row][5] = rook
+            #Big
+        else:
+            king:King = self.board[row][4]
+            rook:Rook = self.board[row][0]
+            if not king.moved and not rook.moved:
+                self.board[row][2] = king
+                self.board[row][3] = rook
+
+    def move_enpassant(self, current_field, turn):
+        if self.enpassant and (current_field == [self.enpassant[0]-1, self.enpassant[1]] or
+                current_field == [self.enpassant[0]+1, self.enpassant[1]]) \
+                and board[enpassant[0]][enpassant[1]].color != board[current_field[0]][cucurrent_field[1]]:
+
+            return_piece = self.board[enpassant[0]][enpassant[1]+1]
+            self.board[enpassant[0]][enpassant[1]+1] = board[current_field[0]][current_field[1]]
+
+            return return_piece
+
+        else: raise Exception("Illegal enpassant move!")
+    
     def is_field_attacked(self, coord, color):
-        attacced = False
-        for row in self.board:
-            for col in row:
-                piece = self.board[row][col]
-                attacced = piece.abbr != "^" and ((row,col),coord)) in rowself.get_piece_attack_moves(self, (row,col), not color)
-                if attacced:
-                    break
-            if attacced: 
+    attacced = False
+    for row in self.board:
+        for col in row:
+            piece = self.board[row][col]
+            attacced = piece.abbr != "^" and ((row,col),coord)) in rowself.get_piece_attack_moves(self, (row,col), not color)
+            if attacced:
                 break
-        return attacced
-    #def castle(self, small, turn):
-        #King is at (0,4)
-        #if small:
+        if attacced: 
+            break
+    return attacced
 
-
-b = Board()
-print(b)
+if __name__ == '__main__':
+    b = Board()
+    print(b)
