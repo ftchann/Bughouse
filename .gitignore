@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 #webstuff
-node-modules/
+node_modules/
