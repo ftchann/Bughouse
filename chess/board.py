@@ -246,7 +246,6 @@ class Board:
             except:
                 pass
                     
-
     def move(self, current_square, next_square, turn):
         '''
         Executes a Normal Move
