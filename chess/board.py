@@ -294,7 +294,7 @@ class Board:
         for row in self.board:
             for col in row:
                 piece = self.board[row][col]
-                attacced = piece.abbr != "^" and ((row,col),coord)) in rowself.get_piece_attack_moves(self, (row,col), not color)
+                attacced = not (piece = None) and ((row,col),coord)) in rowself.get_piece_attack_moves(self, (row,col), not color)
                 if attacced:
                     break
             if attacced:
