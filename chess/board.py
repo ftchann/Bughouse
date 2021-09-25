@@ -77,7 +77,7 @@ class Board:
     def get_piece_attack_moves(self, coord, turn):
         ''' Get all of the attack possible moves from a piece
             Assumes there is piece.
-            Only Normal normals, No castling enpassent.
+            Only Normal normals, No castling enpassant.
         '''
 
         x = coord[0]
@@ -246,9 +246,9 @@ class Board:
         self.board[current_square[0]][current_square[1]] = None
         taken_piece = self.board[next_square[0]][next_square[1]]
         self.board[next_square[0]][next_square[1]] = piece
-        #Set enpassent flag
+        #Set enpassant flag
         if type(piece) is Pawn and abs(current_square[1] - next_square[1]) == 2:
-            self.enpassent = next_square
+            self.enpassant = next_square
         #Assume rule pawns removed last row
         #white
         if turn and type(piece) is Pawn and next_square[1] == 7:
@@ -259,7 +259,7 @@ class Board:
         return (taken_piece, None)
 
     def castle(self, small, turn):
-        #todo add legatity
+        #TODO add legatity
         #King is at (turn,4)
         row = 7 if turn else 0
         if small:
@@ -276,27 +276,32 @@ class Board:
                 self.board[row][2] = king
                 self.board[row][3] = rook
 
-    def move_enpassant(self, current_field, turn):
-        if self.enpassant and (current_field == [self.enpassant[0]-1, self.enpassant[1]] or
-                current_field == [self.enpassant[0]+1, self.enpassant[1]]) \
-                and self.board[self.enpassant[0]][self.enpassant[1]].color != self.board[current_field[0]][current_field[1]]:
+    def check_enpassant(self, current_field, turn):
+        return self.enpassant and (current_field in [[self.enpassant[0]-1, self.enpassant[1]],
+                                                 [self.enpassant[0]+1, self.enpassant[1]]]) \
+                                and self.board[self.enpassant[0]][self.enpassant[1]].color == \
+                                    self.board[current_field[0]][current_field[1]].color
 
-            return_piece = self.board[self.enpassant[0]][self.enpassant[1]+1]
-            self.board[self.enpassant[0]][self.enpassant[1]+1] = self.board[current_field[0]][current_field[1]]
+    def move_enpassant(self, current_field, turn):
+        dy = 1 if turn else -1
+
+        if self.check_enpassant(current_field, turn):
+            return_piece = self.board[self.enpassant[0]][self.enpassant[1]+dy]
+            self.board[self.enpassant[0]][self.enpassant[1]+dy] = self.board[current_field[0]][current_field[1]]
 
             return return_piece
 
         else: raise Exception("Illegal enpassant move!")
 
     def is_field_attacked(self, coord, color):
-    attacced = False
-    for row in range(8):
-        for col in range(8):
-            piece = self.board[row][col]
-            attacced = not (piece == None) and ((row,col),coord) in self.get_piece_attack_moves(self, (row,col), not color)
-            if attacced:
-                return attacced
-    return attacced
+        attacced = False
+        for row in range(8):
+            for col in range(8):
+                piece = self.board[row][col]
+                attacced = not (piece is None) and ((row,col),coord) in self.get_piece_attack_moves(self, (row,col), not color)
+                if attacced:
+                    return attacced
+        return attacced
 
 if __name__ == '__main__':
     b = Board()
