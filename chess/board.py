@@ -208,6 +208,7 @@ class Board:
                     possible_moves.append((coord, (x,y-1)))
                     if not piece.moved and self.board[x][y-2] is None:
                         possible_moves.append((coord, (x, y-2)))
+        return possible_moves + attack_moves
     def get_all_moves(self, turn):
         ''' Get all of the possible normal moves from a piece
         '''
