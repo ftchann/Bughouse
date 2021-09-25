@@ -18,7 +18,14 @@ def blabla():
 @socket_.on('connect')
 def test_connect():
     emit('chat message','Hafti Abi Babi Strassenstyle.')
+    print('user connected')
 
+@socket_.on('disconnect')
+def test_disconnect():
+    print('Client disconnected')
 
+@socket_.on('chat message')
+def test_message(message):
+    emit('chat message', message, broadcast=True)
 if __name__ == '__main__':
-    socket_.run(app, debug=True)
+    socket_.run(app, debug=True, host='0.0.0.0')
