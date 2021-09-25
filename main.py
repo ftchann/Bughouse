@@ -8,7 +8,7 @@ socket_ = SocketIO(app, async_mode=async_mode)
 @app.route('/')
 
 def index():
-    return render_template('index.html',
+    return render_template('test.html',
                             sync_mode=socket_.async_mode)
 
 
@@ -19,7 +19,7 @@ def blabla():
 
 @socket_.on('connect')
 def test_connect():
-    emit('after connect', {'data': 'Hafti Abi Babi Strassenstyle.'})
+    emit('after connect', {'chat message': 'Hafti Abi Babi Strassenstyle.'})
 
 
 if __name__ == '__main__':
