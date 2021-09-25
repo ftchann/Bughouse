@@ -289,15 +289,14 @@ class Board:
         else: raise Exception("Illegal enpassant move!")
 
     def is_field_attacked(self, coord, color):
-        attacced = False
-        for row in range(8):
-            for col in range(8):
-                piece = self.board[row][col]
-                attacced = not (piece == None) and ((row, col), coord) in self.get_piece_attack_moves(self, (row, col), not color)
-                if attacced:
-                    return  attacced
-
-        return attacced
+    attacced = False
+    for row in range(8):
+        for col in range(8):
+            piece = self.board[row][col]
+            attacced = not (piece == None) and ((row,col),coord) in self.get_piece_attack_moves(self, (row,col), not color)
+            if attacced:
+                return attacced
+    return attacced
 
 if __name__ == '__main__':
     b = Board()
